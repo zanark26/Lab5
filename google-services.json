@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "981374694027",
+    "project_id": "todosapp-442f2",
+    "storage_bucket": "todosapp-442f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981374694027:android:7d740ca4103477ea8b1a8e",
+        "android_client_info": {
+          "package_name": "com.firebaseauth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxVvOaadK38px5emsdaNRcoAw6GB6hXs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981374694027:android:0ce5803aaa07f4568b1a8e",
+        "android_client_info": {
+          "package_name": "com.giang.lab5"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxVvOaadK38px5emsdaNRcoAw6GB6hXs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981374694027:android:3fd20a29e2e4a52c8b1a8e",
+        "android_client_info": {
+          "package_name": "com.huutv.DemoReactNativeFirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxVvOaadK38px5emsdaNRcoAw6GB6hXs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
