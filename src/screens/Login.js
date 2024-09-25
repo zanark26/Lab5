@@ -2,6 +2,7 @@ import { View } from "react-native"
 import { Button, HelperText, Text, TextInput } from "react-native-paper"
 import { login, useMyContextController } from "../store"
 import { useEffect, useState } from "react"
+import GoogleLogin from "./GoogleLogin"
 
 const Login = ({navigation}) => {
     const [controller, dispatch] = useMyContextController()
@@ -13,6 +14,9 @@ const Login = ({navigation}) => {
     const hasErrorPassword = () => password.length < 6
     const handleLogin = () => {
         login(dispatch, email, password)
+    }
+    const handleGoogleLoginSuccess = () => {
+        navigation.navigate("Customer");
     }
 
     useEffect(() => {
@@ -68,6 +72,7 @@ const Login = ({navigation}) => {
                     Forgot Password
                 </Button>
             </View>
+            <GoogleLogin onLoginSuccess={handleGoogleLoginSuccess}/>
         </View>
     )
 }

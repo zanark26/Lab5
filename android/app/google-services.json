@@ -12,7 +12,12 @@
           "package_name": "com.firebaseauth"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "981374694027-lv2uohil5e2hhmvihbeclhj1tj00qdkf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAxVvOaadK38px5emsdaNRcoAw6GB6hXs0"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981374694027-8t6bhc03tgj8gb228dsjk5ru4t2jvis5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +41,20 @@
           "package_name": "com.giang.lab5"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "981374694027-nsoi1srgiitdffqdp24uj66nqnnfoen8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.giang.lab5",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "981374694027-lv2uohil5e2hhmvihbeclhj1tj00qdkf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAxVvOaadK38px5emsdaNRcoAw6GB6hXs0"
@@ -39,7 +62,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981374694027-8t6bhc03tgj8gb228dsjk5ru4t2jvis5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -50,7 +78,20 @@
           "package_name": "com.huutv.DemoReactNativeFirebase"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "981374694027-i8jkpklabk2ggf776mprm0hpt0bcdef2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.huutv.DemoReactNativeFirebase",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "981374694027-lv2uohil5e2hhmvihbeclhj1tj00qdkf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAxVvOaadK38px5emsdaNRcoAw6GB6hXs0"
@@ -58,7 +99,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981374694027-8t6bhc03tgj8gb228dsjk5ru4t2jvis5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

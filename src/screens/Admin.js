@@ -20,7 +20,7 @@ const Admin = () => {
                     tabBarIcon:"cash"
                 }}
             />
-            <Tab.Screen name="Customers" component={Customers}
+            <Tab.Screen name="Customers" component={Customer}
                 options={{
                     tabBarIcon:"account"
                 }}

@@ -18,6 +18,7 @@ const Router = ()=>{
       <Stack.Screen name="Admin" component={Admin}/>
       <Stack.Screen name="Customer" component={Customer}/>
       <Stack.Screen name="Register" component={Register}/>
+
     </Stack.Navigator>
   )
 }
