@@ -4,6 +4,7 @@ import auth from "@react-native-firebase/auth"
 import { useEffect } from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import Router from "./src/routers/Routers"
+import Toast from "react-native-toast-message"
 
 const App = () => {
   const USERS = firestore().collection("USERS")
@@ -35,6 +36,7 @@ const App = () => {
       <NavigationContainer>
         <Router />
       </NavigationContainer>
+      <Toast/>
     </MyContextControllerProvider>
   )
 }

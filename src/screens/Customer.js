@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth'; // Import Firebase auth
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation for navigation
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Customer = () => {
     const [customers, setCustomers] = useState([]);
-    const [newCustomer, setNewCustomer] = useState({
-        id: '',
-        fullName: '',
-        email: '',
-        phone: '',
-        address: '',
-        role: 'customer'
-    });
-    const navigation = useNavigation(); // Use navigation for routing
+    const navigation = useNavigation();
 
     useEffect(() => {
         const subscriber = firestore()
@@ -26,7 +19,7 @@ const Customer = () => {
                 querySnapshot.forEach(documentSnapshot => {
                     customers.push({
                         ...documentSnapshot.data(),
-                        key: documentSnapshot.id, // Setting the document ID as 'key'
+                        key: documentSnapshot.id,
                     });
                 });
                 setCustomers(customers);
@@ -35,151 +28,128 @@ const Customer = () => {
         return () => subscriber();
     }, []);
 
-    const addOrUpdateCustomer = async () => {
-        if (!newCustomer.fullName || !newCustomer.email) {
-            Alert.alert('Error', 'Please fill in at least the name and email');
-            return;
-        }
-
-        try {
-            if (newCustomer.id) {
-                // Update existing customer
-                await firestore().collection('USERS').doc(newCustomer.id).update(newCustomer);
-                Alert.alert('Success', 'Customer updated successfully');
-            } else {
-                // Add new customer
-                await firestore().collection('USERS').add(newCustomer);
-                Alert.alert('Success', 'New customer added successfully');
-            }
-            resetForm(); // Clear the form after adding or updating
-        } catch (error) {
-            console.error('Error saving customer: ', error);
-            Alert.alert('Error', 'Failed to save customer');
-        }
-    };
-
-    const resetForm = () => {
-        setNewCustomer({ id: '', fullName: '', email: '', phone: '', address: '', role: 'customer' });
-    };
-
     const renderItem = ({ item }) => (
         <View style={styles.itemContainer}>
-            <Text>Name: {item.fullName}</Text>
-            <Text>Email: {item.email}</Text>
-            <Text>Phone: {item.phone}</Text>
-            <Text>Address: {item.address}</Text>
+            <View style={styles.infoContainer}>
+                <Text>Name: {item.fullName}</Text>
+                <Text>Email: {item.email}</Text>
+                <Text>Phone: {item.phone}</Text>
+                <Text>Address: {item.address}</Text>
+            </View>
             <View style={styles.buttonContainer}>
-                <Button title="Edit" onPress={() => editCustomer(item)} />
-                <Button title="Delete" onPress={() => deleteCustomer(item.key)} />
+                <TouchableOpacity onPress={() => editCustomer(item)} style={styles.iconButton}>
+                    <Icon name="edit" size={30} color="blue" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteCustomer(item.key)} style={styles.iconButton}>
+                    <Icon name="delete" size={30} color="red" />
+                </TouchableOpacity>
             </View>
         </View>
     );
 
     const editCustomer = (customer) => {
-        setNewCustomer({ ...customer, id: customer.key });
+        navigation.navigate('EditCustomer', { customer });
     };
 
     const deleteCustomer = async (id) => {
         try {
             await firestore().collection('USERS').doc(id).delete();
-            Alert.alert('Success', 'Customer deleted successfully');
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Customer deleted successfully'
+            });
         } catch (error) {
             console.error('Error deleting customer: ', error);
-            Alert.alert('Error', 'Failed to delete customer');
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to delete customer'
+            });
         }
     };
 
-    // Function to handle sign out
     const handleSignOut = async () => {
         try {
             await auth().signOut();
-            Alert.alert('Success', 'Signed out successfully');
-            navigation.navigate('Login'); // Navigate to login screen
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Signed out successfully'
+            });
+            navigation.navigate('Login');
         } catch (error) {
             console.error('Error signing out: ', error);
-            Alert.alert('Error', 'Failed to sign out. Please try again.');
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to sign out. Please try again.'
+            });
         }
     };
-   
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Customer List</Text>
-            
-            {/* Nút đăng xuất */}
-            <Button title="Logout" onPress={handleSignOut} color="red" />
-
-            
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Full Name"
-                    value={newCustomer.fullName}
-                    onChangeText={(text) => setNewCustomer({...newCustomer, fullName: text})}
+            <View style={styles.content}>
+                <Text style={styles.title}>Customer List</Text>
+                <FlatList data={customers}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.key}
                 />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={newCustomer.email}
-                    onChangeText={(text) => setNewCustomer({...newCustomer, email: text})}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Phone"
-                    value={newCustomer.phone}
-                    onChangeText={(text) => setNewCustomer({...newCustomer, phone: text})}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Address"
-                    value={newCustomer.address}
-                    onChangeText={(text) => setNewCustomer({...newCustomer, address: text})}
-                />
-                {/* This button changes dynamically based on whether we're adding or updating a customer */}
-                <Button 
-                    title={newCustomer.id ? "Update Customer" : "Add Customer"} 
-                    onPress={addOrUpdateCustomer} 
-                />
-                {/* Add a cancel/reset button when editing */}
-                {newCustomer.id && <Button title="Cancel Edit" onPress={resetForm} />}
             </View>
-            <FlatList
-                data={customers}
-                renderItem={renderItem}
-                keyExtractor={item => item.key}
-            />
+            <View style={styles.footer}>
+                <TouchableOpacity onPress={handleSignOut} style={styles.logoutButton}>
+                    <Icon name="logout" size={50} color="red" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('AddCustomer')} style={styles.addButton}>
+                    <Icon name="add" size={50} color="blue" />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    inputContainer: {
-        marginBottom: 20,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 10,
-        marginBottom: 10,
-    },
     itemContainer: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    infoContainer: {
+        flex: 1,
     },
     buttonContainer: {
         flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginLeft: 10,
+    },
+    container: {
+        flex: 1,
+        padding: 10,
+    },
+    content: {
+        flex: 1,
+    },
+    footer: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 10,
+        alignItems: 'center',
+        paddingVertical: 10,
+    },
+    logoutButton: {
+        marginRight: 10,
+    },
+    addButton: {
+        marginLeft: 10,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
+    iconButton: {
+        marginRight: 15, // Space between buttons
     },
 });
 
