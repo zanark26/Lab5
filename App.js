@@ -5,12 +5,13 @@ import { useEffect } from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import Router from "./src/routers/Routers"
 import Toast from "react-native-toast-message"
+import { Provider } from "react-native-paper"
 
 const App = () => {
   const USERS = firestore().collection("USERS")
   const admin = {
     fullName: "Admin",
-    email: "vanhuduhsp@gmail.com",
+    email: "vanhuudhsp@gmail.com",
     password: "123456",
     phone: "091313732",
     address: "Binh Duong",
