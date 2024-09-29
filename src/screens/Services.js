@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Modal, Button, Alert } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 
 const Services = ({ navigation }) => {
     const [services, setServices] = useState([]);
-    const [selectedService, setSelectedService] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         const unsubscribe = firestore()
@@ -25,45 +23,40 @@ const Services = ({ navigation }) => {
         return () => unsubscribe();
     }, []);
 
-    // Function to format price (e.g., 500000 -> 500.000)
     const formatPrice = (price) => {
         return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     };
 
-    // Function to handle deleting the service
-    const handleDeleteService = async () => {
+    const handleDeleteService = async (serviceId) => {
         try {
-            await firestore().collection('SERVICES').doc(selectedService.id).delete();
-            setModalVisible(false); // Close the modal after deletion
+            await firestore().collection('SERVICES').doc(serviceId).delete();
         } catch (error) {
             console.error('Error deleting service: ', error);
         }
     };
 
-    // Confirm delete action
-    const confirmDelete = () => {
+    const confirmDelete = (service) => {
         Alert.alert(
             'Delete Service',
-            `Are you sure you want to delete the service "${selectedService.name}"?`,
+            `Are you sure you want to delete the service "${service.name}"?`,
             [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', onPress: handleDeleteService, style: 'destructive' },
+                { text: 'Delete', onPress: () => handleDeleteService(service.id), style: 'destructive' },
             ]
         );
     };
 
     const handleLongPress = (service) => {
-        setSelectedService(service);
-        confirmDelete();
+        confirmDelete(service);
     };
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.itemContainer}
             onPress={() => navigation.navigate('ServiceDetail', { serviceId: item.id })}
-            onLongPress={() => handleLongPress(item)} // Long press to delete service
+            onLongPress={() => handleLongPress(item)}
         >
-            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
             <Text style={styles.itemPrice}>{formatPrice(item.price)} đ</Text>
         </TouchableOpacity>
     );
@@ -112,11 +105,16 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
+        alignItems: 'center',
     },
     itemName: {
         fontSize: 18,
         fontWeight: 'bold',
         color: 'black',
+        flex: 1,
+        marginRight: 10, // Khoảng cách giữa tên dịch vụ và giá
+        overflow: 'hidden', // Ẩn phần văn bản không vừa
+        textAlign: 'left', // Canh trái
     },
     itemPrice: {
         fontSize: 18,

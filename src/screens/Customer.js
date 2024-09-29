@@ -1,155 +1,135 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Customer = () => {
-    const [customers, setCustomers] = useState([]);
-    const navigation = useNavigation();
+    const [services, setServices] = useState([]);
+    const [selectedServices, setSelectedServices] = useState([]);
 
     useEffect(() => {
-        const subscriber = firestore()
-            .collection('USERS')
-            .where('role', '==', 'customer')
+        const unsubscribe = firestore()
+            .collection('SERVICES')
             .onSnapshot(querySnapshot => {
-                const customers = [];
+                const servicesList = [];
                 querySnapshot.forEach(documentSnapshot => {
-                    customers.push({
+                    servicesList.push({
                         ...documentSnapshot.data(),
-                        key: documentSnapshot.id,
+                        id: documentSnapshot.id,
                     });
                 });
-                setCustomers(customers);
+                setServices(servicesList);
             });
 
-        return () => subscriber();
+        return () => unsubscribe();
     }, []);
 
-    const renderItem = ({ item }) => (
+    const handleSelectService = (service) => {
+        if (selectedServices.includes(service.id)) {
+            setSelectedServices(prev => prev.filter(id => id !== service.id));
+        } else {
+            setSelectedServices(prev => [...prev, service.id]);
+        }
+    };
+
+    const handleCheckout = async () => {
+        try {
+            for (const serviceId of selectedServices) {
+                await firestore().collection('SERVICES').doc(serviceId).delete();
+                await firestore().collection('TRANSACTIONS').add({
+                    serviceId: serviceId,
+                    timestamp: firestore.FieldValue.serverTimestamp(),
+                });
+            }
+            setSelectedServices([]);
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Services selected and transactions recorded.'
+            });
+        } catch (error) {
+            console.error('Error processing checkout: ', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to process checkout. Please try again.'
+            });
+        }
+    };
+
+    const renderService = ({ item }) => (
         <View style={styles.itemContainer}>
-            <View style={styles.infoContainer}>
-                <Text>Name: {item.fullName}</Text>
-                <Text>Email: {item.email}</Text>
-                <Text>Phone: {item.phone}</Text>
-                <Text>Address: {item.address}</Text>
+            <View style={styles.serviceDetails}>
+                <Text style={styles.serviceName}>{item.name}</Text>
+                <Text style={styles.servicePrice}>{item.price} đ</Text>
             </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => editCustomer(item)} style={styles.iconButton}>
-                    <Icon name="edit" size={30} color="blue" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteCustomer(item.key)} style={styles.iconButton}>
-                    <Icon name="delete" size={30} color="red" />
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={() => handleSelectService(item)}>
+                <Icon 
+                    name={selectedServices.includes(item.id) ? "check-box" : "check-box-outline-blank"} 
+                    size={30} 
+                    color={selectedServices.includes(item.id) ? "green" : "gray"} 
+                />
+            </TouchableOpacity>
         </View>
     );
 
-    const editCustomer = (customer) => {
-        navigation.navigate('EditCustomer', { customer });
-    };
-
-    const deleteCustomer = async (id) => {
-        try {
-            await firestore().collection('USERS').doc(id).delete();
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Customer deleted successfully'
-            });
-        } catch (error) {
-            console.error('Error deleting customer: ', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to delete customer'
-            });
-        }
-    };
-
-    const handleSignOut = async () => {
-        try {
-            await auth().signOut();
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Signed out successfully'
-            });
-            navigation.navigate('Login');
-        } catch (error) {
-            console.error('Error signing out: ', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to sign out. Please try again.'
-            });
-        }
-    };
-
     return (
         <View style={styles.container}>
-            <View style={styles.content}>
-                <Text style={styles.title}>Customer List</Text>
-                <FlatList data={customers}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.key}
-                />
-            </View>
-            <View style={styles.footer}>
-                <TouchableOpacity onPress={handleSignOut} style={styles.logoutButton}>
-                    <Icon name="logout" size={50} color="red" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('AddCustomer')} style={styles.addButton}>
-                    <Icon name="add" size={50} color="blue" />
-                </TouchableOpacity>
-            </View>
+            <Text style={styles.title}>Available Services</Text>
+            <FlatList
+                data={services}
+                renderItem={renderService}
+                keyExtractor={item => item.id}
+            />
+            <Button
+                title="Checkout"
+                onPress={handleCheckout}
+                disabled={selectedServices.length === 0}
+            />
+            {selectedServices.length > 0 && (
+                <Text style={styles.selectedText}>
+                    {selectedServices.length} service(s) selected.
+                </Text>
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    itemContainer: {
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    infoContainer: {
-        flex: 1,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        marginLeft: 10,
-    },
     container: {
         flex: 1,
         padding: 10,
     },
-    content: {
-        flex: 1,
+    itemContainer: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        flexDirection: 'row', // Sắp xếp ngang
+        justifyContent: 'space-between', // Căn giữa các phần tử
+        alignItems: 'center', // Căn giữa theo chiều dọc
     },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 10,
+    serviceDetails: {
+        flex: 1, // Tăng chiều rộng để chiếm toàn bộ không gian còn lại
+        marginRight: 10, // Khoảng cách giữa tên dịch vụ và dấu tích
     },
-    logoutButton: {
-        marginRight: 10,
+    serviceName: {
+        fontSize: 16,
+        fontWeight: 'bold',
     },
-    addButton: {
-        marginLeft: 10,
+    servicePrice: {
+        fontSize: 16,
+        color: '#333',
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
+        marginBottom: 10,
     },
-    iconButton: {
-        marginRight: 15, // Space between buttons
+    selectedText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: 'blue',
     },
 });
 
